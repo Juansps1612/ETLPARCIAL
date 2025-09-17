@@ -11,9 +11,19 @@ class Extractor:
 
     def extract(self):
         try:
-            df = self.spark.read.option("header", True).csv(self.file_path)
+            # inferSchema = True ayuda a que Spark detecte tipos numéricos como double
+            df = (
+                self.spark.read
+                .option("header", True)
+                .option("inferSchema", True)
+                .option("mode", "PERMISSIVE")
+                .csv(self.file_path)
+            )
             print(f"📥 Datos extraídos: {df.count()} filas, {len(df.columns)} columnas")
+            # Si quieres ver el schema para debugging:
+            # df.printSchema()
             return df
         except Exception as e:
             print(f"❌ Error al extraer datos: {e}")
             return None
+
